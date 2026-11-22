@@ -18,12 +18,19 @@ PPE = [("helmet", "Helmet"), ("vest", "Safety vest"), ("gloves", "Gloves"), ("sh
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    print("Starting SafeGuard AI migrations...", flush=True)
     run_migrations()
-    with SessionLocal() as db:
-        for c, n in PPE:
-            if not db.scalar(select(PPEType.id).where(PPEType.code == c).limit(1)):
-                db.add(PPEType(code=c, name=n))
-        db.commit()
+    print("SafeGuard AI migrations complete", flush=True)
+    try:
+        with SessionLocal() as db:
+            for c, n in PPE:
+                if not db.scalar(select(PPEType.id).where(PPEType.code == c).limit(1)):
+                    db.add(PPEType(code=c, name=n))
+            db.commit()
+    except Exception as exc:
+        print(f"SafeGuard AI startup seed failed: {type(exc).__name__}: {exc}", flush=True)
+        raise
+    print("SafeGuard AI startup complete", flush=True)
     yield
 
 
