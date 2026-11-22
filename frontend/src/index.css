@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 244 245 247; --surface: 255 255 255; --line: 223 227 233;
+  --ink: 20 27 38; --muted: 98 108 124; --accent: 30 78 140;
+  --ok: 21 128 61; --bad: 185 28 28; --warn: 161 98 7;
+}
+.dark {
+  --bg: 15 18 23; --surface: 22 26 33; --line: 40 46 56;
+  --ink: 228 232 238; --muted: 135 145 160; --accent: 110 168 230;
+  --ok: 74 222 128; --bad: 248 113 113; --warn: 251 191 36;
+}
+* { scrollbar-width: thin; scrollbar-color: rgb(var(--line)) transparent; }
+html { scroll-behavior: smooth; }
+body { @apply bg-bg text-ink antialiased; font-variant-numeric: tabular-nums; margin: 0; }
+.field, .btn, button, a, select { transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 160ms ease; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button:not(:disabled):active, .btn:not(:disabled):active { transform: translateY(1px); }
+:focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 2px; }
+.field { @apply w-full rounded-md border border-line bg-surface px-3 py-2.5 text-sm placeholder:text-muted; }
+.field:focus { border-color: rgb(var(--accent)); box-shadow: 0 0 0 3px rgb(var(--accent) / 0.12); outline: none; }
+.btn { @apply inline-flex items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50; box-shadow: 0 1px 2px rgb(15 23 42 / 0.12); }
+.page-header { @apply mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center; }
+.page-header h1 { @apply text-xl font-semibold tracking-tight; }
+.page-header p { @apply mt-1 text-sm text-muted; }
+.card { @apply rounded-lg border border-line bg-surface shadow-sm; }
+.error-banner { @apply flex items-center gap-2 rounded-md border border-bad/30 bg-bad/10 px-3 py-2.5 text-sm text-bad; }
+.loading-panel { @apply flex min-h-32 items-center justify-center gap-2 rounded-lg border border-line bg-surface text-sm text-muted; }
+.status-badge { @apply inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium capitalize; }
+.status-dot { @apply h-1.5 w-1.5 rounded-full bg-current; }
+.status-ok { @apply bg-ok/10 text-ok; }
+.status-error { @apply bg-bad/10 text-bad; }
+.status-neutral { @apply bg-muted/10 text-muted; }
+.surface-grid { @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-4; }
+@keyframes sg-fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.page-enter { animation: sg-fade-in 180ms ease-out both; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }

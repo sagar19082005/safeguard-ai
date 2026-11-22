@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: safeguard
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-safeguard}
+      POSTGRES_DB: safeguard
+    volumes: [pgdata:/var/lib/postgresql/data]
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U safeguard"]
+      interval: 5s
+      retries: 10
+  api:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg://safeguard:${POSTGRES_PASSWORD:-safeguard}@db:5432/safeguard
+    depends_on: {db: {condition: service_healthy}}
+    ports: ["8000:8000"]
+    volumes:
+      - evidence:/srv/evidence
+      - uploads:/srv/uploads
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  worker:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg://safeguard:${POSTGRES_PASSWORD:-safeguard}@db:5432/safeguard
+    command: ["python", "-m", "app.workers.video_worker"]
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    volumes:
+      - evidence:/srv/evidence
+      - uploads:/srv/uploads
+  web:
+    build: ./frontend
+    depends_on:
+      api:
+        condition: service_healthy
+    ports: ["5173:80"]
+volumes:
+  pgdata:
+  evidence:
+  uploads:
